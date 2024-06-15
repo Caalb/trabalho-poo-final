@@ -7,23 +7,20 @@
     </div>
 
     <div>
-        <form asp-action="CreateAccount" method="post">
+        <form asp-action="CreateAccount" asp-controller="Home" method="post">
             <div>
-                <label for="Nome" />
-                @Html.LabelFor(model => model.Owner.FirstName)
-                @Html.EditorFor(model => model.Owner.FirstName)
+                <label for="name">Nome:</label>
+                <input type="text" id="name" name="firstName" class="name-input" required minlength="2" />
             </div>
             <div>
-                <label for="Sobrenome" />
-                @Html.LabelFor(model => model.Owner.LastName)
-                @Html.EditorFor(model => model.Owner.LastName)
+                <label for="lastname">Sobrenome:</label>
+                <input type="text" id="lastname" name="lastName" class="lastname-input" required minlength="2" />
             </div>
             <div>
-                <label for="Saldo" />
-                @Html.LabelFor(model => model.Balance)
-                @Html.EditorFor(model => model.Balance)
+                <label for="balance">Saldo inicial:</label>
+                <input type="number" id="balance" name="balance" class="balance-input" required minlength="1" />
             </div>
-            <button type="submit">Criar</button>
+            <button type="submit" class="create-account-submit-btn">Criar</button>
         </form>
     </div>
 </div>

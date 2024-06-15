@@ -8,6 +8,6 @@ namespace PucBank.Models
     [Required]
     public Owner Owner { get; set; } = new();
     [Required]
-    public int Balance { get; set; }
+    public decimal Balance { get; set; }
   }
 }

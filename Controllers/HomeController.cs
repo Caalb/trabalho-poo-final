@@ -14,21 +14,11 @@ public class HomeController(ILogger<HomeController> logger) : Controller
     }
 
     [HttpPost]
-    [Route("Home/CreateAccount")]
-    public IActionResult CreateAccount(IFormCollection form)
+    [Route("Home/CreateNewAccount")]
+    public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] decimal balance)
     {
         try
         {
-
-            string firstName = form["FirstName"];
-            string lastName = form["LastName"];
-            int balance = 0;
-
-            if (int.TryParse(form["Balance"], out int parsedBalance))
-            {
-                balance = parsedBalance;
-            }
-
             _logger.LogInformation("Creating account for {FirstName} {LastName} with balance {Balance}", firstName, lastName, balance);
 
             Account user = new()
@@ -43,14 +33,12 @@ public class HomeController(ILogger<HomeController> logger) : Controller
 
             return View("Menu", user);
         }
-
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating account");
             ModelState.AddModelError("", "Error creating account");
+            return View();
         }
-
-        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

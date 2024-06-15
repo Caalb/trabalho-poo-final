@@ -1,5 +1,10 @@
 @model Account;
 
+<div class="text-center">
+  <h1>Bem-vindo, @Model.Owner.FirstName @Model.Owner.LastName!</h1>
+</div>
+
 <div>
-  <p>Bem-vindo @Model.Owner.FirstName @Model.Owner.LastName!</p>
+  <h3>O que deseja fazer hoje?</h3>
+  <h5>Saldo: R$@Model.Balance,00</h5>
 </div>
