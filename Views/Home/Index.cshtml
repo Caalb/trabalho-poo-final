@@ -6,21 +6,21 @@
         <p>Crie uma conta agora mesmo e aproveite as vantagens únicas do PucBank!</p>
     </div>
 
-    <div>
-        <form asp-action="CreateAccount" asp-controller="Home" method="post">
-            <div>
+    <div class="d-flex justify-content-center">
+        <form asp-action="CreateAccount" asp-controller="Home" method="post" class="d-flex flex-column">
+            <div class="d-flex justify-content-center gap-2">
                 <label for="name">Nome:</label>
                 <input type="text" id="name" name="firstName" class="name-input" required minlength="2" />
             </div>
-            <div>
+            <div class="d-flex justify-content-center gap-2">
                 <label for="lastname">Sobrenome:</label>
                 <input type="text" id="lastname" name="lastName" class="lastname-input" required minlength="2" />
             </div>
-            <div>
+            <div class="d-flex justify-content-center gap-2">
                 <label for="balance">Saldo inicial:</label>
                 <input type="number" id="balance" name="balance" class="balance-input" required minlength="1" />
             </div>
-            <button type="submit" class="create-account-submit-btn">Criar</button>
+            <button type="submit" class="create-account-submit-btn btn btn-success btn-sm mt-2">Criar</button>
         </form>
     </div>
 </div>
