@@ -11,7 +11,7 @@ Trabalho final de POO.
 
 This project was built using:
 
-- ASP.NET (C#)
+- ASP.NET (C#): NET 8.0
 - JavaScript
 - HTML
 - CSS
