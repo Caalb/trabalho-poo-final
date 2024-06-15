@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PucBank")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a07ec173d543540403d20d878b545690b1c0e297")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+780a34a6b3c5083457407ec9837925b15231b948")]
 [assembly: System.Reflection.AssemblyProductAttribute("PucBank")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PucBank")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
