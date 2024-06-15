@@ -1,8 +1,29 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model Account
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <div>
+        <h1>Bem-vindo ao PucBank!</h1>
+        <p>Crie uma conta agora mesmo e aproveite as vantagens únicas do PucBank!</p>
+    </div>
+
+    <div>
+        <form asp-action="CreateAccount" method="post">
+            <div>
+                <label for="Nome" />
+                @Html.LabelFor(model => model.Owner.FirstName)
+                @Html.EditorFor(model => model.Owner.FirstName)
+            </div>
+            <div>
+                <label for="Sobrenome" />
+                @Html.LabelFor(model => model.Owner.LastName)
+                @Html.EditorFor(model => model.Owner.LastName)
+            </div>
+            <div>
+                <label for="Saldo" />
+                @Html.LabelFor(model => model.Balance)
+                @Html.EditorFor(model => model.Balance)
+            </div>
+            <button type="submit">Criar</button>
+        </form>
+    </div>
 </div>
