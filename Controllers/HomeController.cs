@@ -31,6 +31,7 @@ public class HomeController(ILogger<HomeController> logger) : Controller
                 Balance = balance
             };
 
+            _logger.LogInformation("Account created! {FirstName} {LastName}, R${Balance},00", firstName, lastName, balance);
             return View("Menu", user);
         }
         catch (Exception ex)
@@ -40,6 +41,8 @@ public class HomeController(ILogger<HomeController> logger) : Controller
             return View();
         }
     }
+
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
