@@ -5,14 +5,9 @@ using PucBank.Models;
 
 namespace PucBank.Controllers;
 
-public class HomeController : Controller
+public class HomeController(ILogger<HomeController> logger) : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<HomeController> _logger = logger;
 
     public IActionResult Index()
     {
@@ -34,7 +29,8 @@ public class HomeController : Controller
                     FirstName = firstName,
                     LastName = lastName
                 },
-                Balance = balance
+                Balance = balance,
+                UserHistory = new TransactionHistory()
             };
 
             TempData["User"] = JsonConvert.SerializeObject(user);
@@ -69,9 +65,9 @@ public class HomeController : Controller
     [Route("Home/Deposit")]
     public IActionResult Deposit([FromForm] int depositAmount)
     {
-        if(depositAmount <= 0)
+        if (depositAmount <= 0)
         {
-            ModelState.AddModelError("", "Deposit amount must be greater than 0");
+            ModelState.AddModelError("", "Invalid deposit amount");
             return RedirectToAction("ShowMenu");
         }
 
@@ -84,10 +80,19 @@ public class HomeController : Controller
         var user = JsonConvert.DeserializeObject<Account>(userJson);
 
         _logger.LogInformation("Depositing R${DepositAmount},00 for {User}", depositAmount, user);
-
         user.Balance += depositAmount;
-
         TempData["User"] = JsonConvert.SerializeObject(user);
+
+        var depositTransaction = new Transaction()
+        {
+            TransactionId = Guid.NewGuid().ToString(),
+            TransactionType = "Deposit",
+            Amount = depositAmount,
+            Date = DateTime.Now
+        };
+
+        var userHistory = user.UserHistory.Transactions;
+        userHistory.Add(depositTransaction);
 
         return RedirectToAction("ShowMenu");
     }
@@ -103,6 +108,14 @@ public class HomeController : Controller
         }
 
         var user = JsonConvert.DeserializeObject<Account>(userJson);
+
+        if (withdrawAmount <= 0 || withdrawAmount > user?.Balance || user?.Balance < withdrawAmount)
+        {
+            ModelState.AddModelError("", "Invalid withdraw amount");
+            return RedirectToAction("ShowMenu");
+        }
+
+        _logger.LogInformation("Withdrawing R${WithdrawAmount},00 for {User}", withdrawAmount, user);
         user.Balance -= withdrawAmount;
 
         TempData["User"] = JsonConvert.SerializeObject(user);

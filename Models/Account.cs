@@ -1,13 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace PucBank.Models
+namespace PucBank.Models;
 
+public class Account
 {
-  public class Account
-  {
-    [Required]
-    public Owner Owner { get; set; } = new();
-    [Required]
-    public int Balance { get; set; }
-  }
+  [Required]
+  public Owner Owner { get; set; } = new();
+  [Required]
+  public int Balance { get; set; }
+
+  public TransactionHistory UserHistory { get; set; } = new();
 }

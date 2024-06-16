@@ -10,29 +10,50 @@
 </div>
 
 <div>
-    <button class="btn btn-success" data-toggle="modal" data-target="#depositModal">Depositar</button>
-    <button class="btn btn-danger" data-toggle="modal" data-target="#withdrawModal">Sacar</button>
     <form method="post" action="@Url.Action("History", "Home")" style="display:inline;">
         <button type="submit" class="btn btn-primary">Ver extrato</button>
     </form>
 </div>
 
-<button type="button" id="meuModalButton" class="btn btn-primary">Abrir Modal</button>
-
-<div class="modal fade" id="meuModal" tabindex="-1" role="dialog" aria-labelledby="meuModalLabel" aria-hidden="true">
+<button type="button" id="depositModalButton" class="btn btn-success">Depositar</button>
+<div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="meuModalLabel">T�tulo do Modal</h5>
+                <h5 class="modal-title" id="depositModalLabel">Título do Modal</h5>
             </div>
             <div class="modal-body">
                 <form asp-action="Deposit" asp-controller="Home" method="post">
                     <div class="modal-body">
-                        <input type="number" name="depositAmount" class="form-control" required>
+                        <input type="number" name="depositAmount" class="form-control" required min="1">
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button type="button" id="withdrawModalButton" class="btn btn-danger">Sacar</button>
+<div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog" aria-labelledby="withdrawModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="withdrawModalLabel">Título do Modal</h5>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Withdraw" asp-controller="Home" method="post">
+                    <div class="modal-body">
+                        <input type="number" name="withdrawAmount" class="form-control" required min="1">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+                        <button type="submit" class="btn btn-success">Enviar</button>
                     </div>
                 </form>
             </div>
@@ -44,8 +65,11 @@
 {
     <script>
         $(document).ready(function () {
-            $("#meuModalButton").click(function () {
-                $("#meuModal").modal("show");
+            $("#depositModalButton").click(function () {
+                $("#depositModal").modal("show");
+            });
+            $("#withdrawModalButton").click(function () {
+                $("#withdrawModal").modal("show");
             });
         });
     </script>
