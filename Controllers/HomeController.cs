@@ -60,7 +60,6 @@ public class HomeController : Controller
         var userJson = TempData["User"].ToString();
         var user = JsonConvert.DeserializeObject<Account>(userJson);
 
-        // Reassign TempData to ensure it persists across multiple requests
         TempData["User"] = userJson;
 
         return View("Menu", user);
@@ -106,7 +105,6 @@ public class HomeController : Controller
         var user = JsonConvert.DeserializeObject<Account>(userJson);
         user.Balance -= withdrawAmount;
 
-        // Reassign TempData to ensure it persists across multiple requests
         TempData["User"] = JsonConvert.SerializeObject(user);
 
         return RedirectToAction("ShowMenu");
