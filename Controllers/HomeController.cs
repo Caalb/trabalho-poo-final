@@ -5,9 +5,14 @@ using PucBank.Models;
 
 namespace PucBank.Controllers;
 
-public class HomeController(ILogger<HomeController> logger) : Controller
+public class HomeController : Controller
 {
-    private readonly ILogger<HomeController> _logger = logger;
+    private readonly ILogger<HomeController> _logger;
+
+    public HomeController(ILogger<HomeController> logger)
+    {
+        _logger = logger;
+    }
 
     public IActionResult Index()
     {
@@ -15,6 +20,7 @@ public class HomeController(ILogger<HomeController> logger) : Controller
     }
 
     [HttpPost]
+    [Route("Home/CreateAccount")]
     public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] int balance)
     {
         try
@@ -43,6 +49,7 @@ public class HomeController(ILogger<HomeController> logger) : Controller
         }
     }
 
+    [Route("Home/ShowMenu")]
     public IActionResult ShowMenu()
     {
         if (TempData["User"] == null)
@@ -52,36 +59,67 @@ public class HomeController(ILogger<HomeController> logger) : Controller
 
         var userJson = TempData["User"].ToString();
         var user = JsonConvert.DeserializeObject<Account>(userJson);
+
+        // Reassign TempData to ensure it persists across multiple requests
+        TempData["User"] = userJson;
+
         return View("Menu", user);
     }
 
+    [HttpPost]
+    [Route("Home/Deposit")]
     public IActionResult Deposit([FromForm] int depositAmount)
     {
-        var userJson = TempData["User"].ToString();
+        if(depositAmount <= 0)
+        {
+            ModelState.AddModelError("", "Deposit amount must be greater than 0");
+            return RedirectToAction("ShowMenu");
+        }
+
+        var userJson = TempData["User"]?.ToString();
+        if (userJson == null)
+        {
+            return RedirectToAction("Index");
+        }
+
         var user = JsonConvert.DeserializeObject<Account>(userJson);
 
         _logger.LogInformation("Depositing R${DepositAmount},00 for {User}", depositAmount, user);
 
         user.Balance += depositAmount;
+
         TempData["User"] = JsonConvert.SerializeObject(user);
+
         return RedirectToAction("ShowMenu");
     }
 
+    [HttpPost]
+    [Route("Home/Withdraw")]
     public IActionResult Withdraw([FromForm] int withdrawAmount)
     {
-        var userJson = TempData["User"].ToString();
+        var userJson = TempData["User"]?.ToString();
+        if (userJson == null)
+        {
+            return RedirectToAction("Index");
+        }
+
         var user = JsonConvert.DeserializeObject<Account>(userJson);
         user.Balance -= withdrawAmount;
+
+        // Reassign TempData to ensure it persists across multiple requests
         TempData["User"] = JsonConvert.SerializeObject(user);
+
         return RedirectToAction("ShowMenu");
     }
 
+    [Route("Home/History")]
     public IActionResult History()
     {
         return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [Route("Home/Error")]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
