@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PucBank.Models;
 
 namespace PucBank.Controllers;
@@ -14,8 +15,7 @@ public class HomeController(ILogger<HomeController> logger) : Controller
     }
 
     [HttpPost]
-    [Route("Home/CreateNewAccount")]
-    public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] decimal balance)
+    public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] int balance)
     {
         try
         {
@@ -31,8 +31,9 @@ public class HomeController(ILogger<HomeController> logger) : Controller
                 Balance = balance
             };
 
+            TempData["User"] = JsonConvert.SerializeObject(user);
             _logger.LogInformation("Account created! {FirstName} {LastName}, R${Balance},00", firstName, lastName, balance);
-            return View("Menu", user);
+            return RedirectToAction("ShowMenu");
         }
         catch (Exception ex)
         {
@@ -41,12 +42,45 @@ public class HomeController(ILogger<HomeController> logger) : Controller
             return View();
         }
     }
-    
-    public IActionResult DepositModal()
+
+    public IActionResult ShowMenu()
+    {
+        if (TempData["User"] == null)
+        {
+            return RedirectToAction("Index");
+        }
+
+        var userJson = TempData["User"].ToString();
+        var user = JsonConvert.DeserializeObject<Account>(userJson);
+        return View("Menu", user);
+    }
+
+    public IActionResult Deposit([FromForm] int depositAmount)
+    {
+        var userJson = TempData["User"].ToString();
+        var user = JsonConvert.DeserializeObject<Account>(userJson);
+
+        _logger.LogInformation("Depositing R${DepositAmount},00 for {User}", depositAmount, user);
+
+        user.Balance += depositAmount;
+        TempData["User"] = JsonConvert.SerializeObject(user);
+        return RedirectToAction("ShowMenu");
+    }
+
+    public IActionResult Withdraw([FromForm] int withdrawAmount)
+    {
+        var userJson = TempData["User"].ToString();
+        var user = JsonConvert.DeserializeObject<Account>(userJson);
+        user.Balance -= withdrawAmount;
+        TempData["User"] = JsonConvert.SerializeObject(user);
+        return RedirectToAction("ShowMenu");
+    }
+
+    public IActionResult History()
     {
         return View();
     }
-    
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
