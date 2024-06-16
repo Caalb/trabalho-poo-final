@@ -1,53 +1,52 @@
 @model PucBank.Models.Account
 
 <div class="text-center">
-  <h1>Bem-vindo, @Model.Owner.FirstName @Model.Owner.LastName!</h1>
+    <h1>Bem-vindo, @Model.Owner.FirstName @Model.Owner.LastName!</h1>
 </div>
 
 <div>
-  <h3>O que deseja fazer hoje?</h3>
-  <h5>Saldo: R$@Model.Balance,00</h5>
+    <h3>O que deseja fazer hoje?</h3>
+    <h5>Saldo: R$@Model.Balance,00</h5>
 </div>
 
 <div>
-  <button class="btn btn-success" data-toggle="modal" data-target="#depositModal">Depositar</button>
-  <button class="btn btn-danger" data-toggle="modal" data-target="#withdrawModal">Sacar</button>
-  <form method="post" action="@Url.Action("History", "Home")" style="display:inline;">
-    <button type="submit" class="btn btn-primary">Ver extrato</button>
-  </form>
+    <button class="btn btn-success" data-toggle="modal" data-target="#depositModal">Depositar</button>
+    <button class="btn btn-danger" data-toggle="modal" data-target="#withdrawModal">Sacar</button>
+    <form method="post" action="@Url.Action("History", "Home")" style="display:inline;">
+        <button type="submit" class="btn btn-primary">Ver extrato</button>
+    </form>
 </div>
 
 <button type="button" id="meuModalButton" class="btn btn-primary">Abrir Modal</button>
 
-<div class="modal fade" id="meuModal" tabindex="-1" role="dialog" aria-labelledby="meuModalLabel" aria-hidden="true">   
-   <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="meuModalLabel">Título do Modal</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-      </div>
-      <div class="modal-body">
-        <form asp-action="Deposit" asp-controller="Home" method="post">
+<div class="modal fade" id="meuModal" tabindex="-1" role="dialog" aria-labelledby="meuModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="meuModalLabel">Título do Modal</h5>
+            </div>
             <div class="modal-body">
-                <input type="number" name="depositAmount" class="form-control" required>
+                <form asp-action="Deposit" asp-controller="Home" method="post">
+                    <div class="modal-body">
+                        <input type="number" name="depositAmount" class="form-control" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-success">Submit</button>
-            </div>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
 </div>
 
 @section Scripts
 {
-  <script>
-  $(document).ready(function() {
-    $("#meuModalButton").click(function() {
-      $("#meuModal").modal("show");
-    });
-  });
-</script>
+    <script>
+        $(document).ready(function () {
+            $("#meuModalButton").click(function () {
+                $("#meuModal").modal("show");
+            });
+        });
+    </script>
 }
