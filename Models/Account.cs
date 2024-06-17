@@ -9,5 +9,5 @@ public class Account
   [Required]
   public int Balance { get; set; }
 
-  public TransactionHistory UserHistory { get; set; } = new();
+  public TransactionHistory AccountHistory { get; set; } = new();
 }
