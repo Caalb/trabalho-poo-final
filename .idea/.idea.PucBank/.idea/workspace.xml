@@ -9,10 +9,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="81920e17-f4c3-424b-8e6a-806258bbb6e5" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Models/Enums/TransactionsType.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Services/AccountService.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Services/IAccountService.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.PucBank/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.PucBank/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Controllers/HomeController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/HomeController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Transaction.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Transaction.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PucBank.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/PucBank.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Views/Home/Menu.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Views/Home/Menu.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Views/Shared/_Layout.cshtml" beforeDir="false" afterPath="$PROJECT_DIR$/Views/Shared/_Layout.cshtml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wwwroot/css/site.css" beforeDir="false" afterPath="$PROJECT_DIR$/wwwroot/css/site.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,7 +104,7 @@
       <updated>1718481406804</updated>
       <workItem from="1718481409620" duration="7288000" />
       <workItem from="1718578504943" duration="721000" />
-      <workItem from="1718579570815" duration="3392000" />
+      <workItem from="1718579570815" duration="4662000" />
     </task>
     <task id="LOCAL-00001" summary="style: melhora layout do formulario">
       <option name="closed" value="true" />

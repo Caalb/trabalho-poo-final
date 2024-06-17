@@ -1,3 +1,4 @@
+@using PucBank.Models.Enums
 @model PucBank.Models.Account
 
 
@@ -26,14 +27,14 @@
                 <div class="py-2">
                     @foreach (var transaction in Model.UserHistory.Transactions)
                     {
-                        if (transaction.TransactionType == "Deposit")
+                        if (transaction.TransactionType == TransactionsType.Deposit)
                         {
                             <div class="d-flex justify-content-between text-success">
                                 <span>@transaction.Date</span>
                                 <span>+@transaction.Amount</span>
                             </div>
                         }
-                        else if (transaction.TransactionType == "Withdraw")
+                        else if (transaction.TransactionType == TransactionsType.Withdraw)
                         {
                             <div class="d-flex justify-content-between text-danger">
                                 <span>@transaction.Date</span>

@@ -2,147 +2,124 @@ using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PucBank.Models;
+using PucBank.Interfaces;
+using Microsoft.Extensions.Logging;
 
-namespace PucBank.Controllers;
-
-public class HomeController(ILogger<HomeController> logger) : Controller
+namespace PucBank.Controllers
 {
-    private readonly ILogger<HomeController> _logger = logger;
-
-    public IActionResult Index()
+    public class HomeController : Controller
     {
-        return View();
-    }
+        private readonly ILogger<HomeController> _logger;
+        private readonly IAccountService _accountService;
 
-    [HttpPost]
-    [Route("Home/CreateAccount")]
-    public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] int balance)
-    {
-        try
+        public HomeController(ILogger<HomeController> logger, IAccountService accountService)
         {
-            _logger.LogInformation("Creating account for {FirstName} {LastName} with balance {Balance}", firstName, lastName, balance);
-
-            Account user = new()
-            {
-                Owner = new Owner
-                {
-                    FirstName = firstName,
-                    LastName = lastName
-                },
-                Balance = balance,
-                UserHistory = new TransactionHistory()
-            };
-
-            TempData["User"] = JsonConvert.SerializeObject(user);
-            _logger.LogInformation("Account created! {FirstName} {LastName}, R${Balance},00", firstName, lastName, balance);
-            return RedirectToAction("ShowMenu");
+            _logger = logger;
+            _accountService = accountService;
         }
-        catch (Exception ex)
+
+        public IActionResult Index()
         {
-            _logger.LogError(ex, "Error creating account");
-            ModelState.AddModelError("", "Error creating account");
             return View();
         }
-    }
 
-    [Route("Home/ShowMenu")]
-    public IActionResult ShowMenu()
-    {
-        if (TempData["User"] == null)
+        [HttpPost]
+        [Route("Home/CreateAccount")]
+        public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] int balance)
         {
-            return RedirectToAction("Index");
+            try
+            {
+                var user = _accountService.CreateAccount(firstName, lastName, balance);
+                TempData["User"] = JsonConvert.SerializeObject(user);
+                return RedirectToAction("ShowMenu");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating account");
+                ModelState.AddModelError("", "Error creating account");
+                return View("Index");
+            }
         }
 
-        var userJson = TempData["User"].ToString();
-        var user = JsonConvert.DeserializeObject<Account>(userJson);
-
-        TempData["User"] = userJson;
-
-        return View("Menu", user);
-    }
-
-    [HttpPost]
-    [Route("Home/Deposit")]
-    public IActionResult Deposit([FromForm] int depositAmount)
-    {
-        if (depositAmount <= 0)
+        [Route("Home/ShowMenu")]
+        public IActionResult ShowMenu()
         {
-            ModelState.AddModelError("", "Invalid deposit amount");
-            return RedirectToAction("ShowMenu");
+            if (TempData["User"] == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            var userJson = TempData["User"].ToString();
+            var user = JsonConvert.DeserializeObject<Account>(userJson);
+
+            TempData["User"] = userJson;
+
+            return View("Menu", user);
         }
 
-        var userJson = TempData["User"]?.ToString();
-        if (userJson == null)
+        [HttpPost]
+        [Route("Home/Deposit")]
+        public IActionResult Deposit([FromForm] int depositAmount)
         {
-            return RedirectToAction("Index");
+            try
+            {
+                var userJson = TempData["User"]?.ToString();
+                if (userJson == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                var user = JsonConvert.DeserializeObject<Account>(userJson);
+                _accountService.Deposit(user, depositAmount);
+                TempData["User"] = JsonConvert.SerializeObject(user);
+
+                return RedirectToAction("ShowMenu");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during deposit");
+                ModelState.AddModelError("", ex.Message);
+                return RedirectToAction("ShowMenu");
+            }
         }
 
-        var user = JsonConvert.DeserializeObject<Account>(userJson);
-
-        _logger.LogInformation("Depositing R${DepositAmount},00 for {User}", depositAmount, user);
-        user.Balance += depositAmount;
-
-        var depositTransaction = new Transaction()
+        [HttpPost]
+        [Route("Home/Withdraw")]
+        public IActionResult Withdraw([FromForm] int withdrawAmount)
         {
-            TransactionId = Guid.NewGuid().ToString(),
-            TransactionType = "Deposit",
-            Amount = depositAmount,
-            Date = DateTime.Now
-        };
+            try
+            {
+                var userJson = TempData["User"]?.ToString();
+                if (userJson == null)
+                {
+                    return RedirectToAction("Index");
+                }
 
-        user.UserHistory.Transactions.Add(depositTransaction);
-        
-        TempData["User"] = JsonConvert.SerializeObject(user);
-        
-        return RedirectToAction("ShowMenu");
-    }
+                var user = JsonConvert.DeserializeObject<Account>(userJson);
+                _accountService.Withdraw(user, withdrawAmount);
+                TempData["User"] = JsonConvert.SerializeObject(user);
 
-    [HttpPost]
-    [Route("Home/Withdraw")]
-    public IActionResult Withdraw([FromForm] int withdrawAmount)
-    {
-        var userJson = TempData["User"]?.ToString();
-        if (userJson == null)
-        {
-            return RedirectToAction("Index");
+                return RedirectToAction("ShowMenu");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during withdraw");
+                ModelState.AddModelError("", ex.Message);
+                return RedirectToAction("ShowMenu");
+            }
         }
 
-        var user = JsonConvert.DeserializeObject<Account>(userJson);
-
-        if (withdrawAmount <= 0 || withdrawAmount > user?.Balance || user?.Balance < withdrawAmount)
+        [Route("Home/History")]
+        public IActionResult History()
         {
-            ModelState.AddModelError("", "Invalid withdraw amount");
-            return RedirectToAction("ShowMenu");
+            return View();
         }
 
-        _logger.LogInformation("Withdrawing R${WithdrawAmount},00 for {User}", withdrawAmount, user);
-        user.Balance -= withdrawAmount;
-        
-        var withdrawTransaction = new Transaction()
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        [Route("Home/Error")]
+        public IActionResult Error()
         {
-            TransactionId = Guid.NewGuid().ToString(),
-            TransactionType = "Withdraw",
-            Amount = withdrawAmount,
-            Date = DateTime.Now
-        };
-        
-        user.UserHistory.Transactions.Add(withdrawTransaction);
-
-        TempData["User"] = JsonConvert.SerializeObject(user);
-
-        return RedirectToAction("ShowMenu");
-    }
-
-    [Route("Home/History")]
-    public IActionResult History()
-    {
-        return View();
-    }
-
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    [Route("Home/Error")]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
     }
 }
