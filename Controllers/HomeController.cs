@@ -81,7 +81,6 @@ public class HomeController(ILogger<HomeController> logger) : Controller
 
         _logger.LogInformation("Depositing R${DepositAmount},00 for {User}", depositAmount, user);
         user.Balance += depositAmount;
-        TempData["User"] = JsonConvert.SerializeObject(user);
 
         var depositTransaction = new Transaction()
         {
@@ -91,9 +90,10 @@ public class HomeController(ILogger<HomeController> logger) : Controller
             Date = DateTime.Now
         };
 
-        var userHistory = user.UserHistory.Transactions;
-        userHistory.Add(depositTransaction);
-
+        user.UserHistory.Transactions.Add(depositTransaction);
+        
+        TempData["User"] = JsonConvert.SerializeObject(user);
+        
         return RedirectToAction("ShowMenu");
     }
 
@@ -117,6 +117,16 @@ public class HomeController(ILogger<HomeController> logger) : Controller
 
         _logger.LogInformation("Withdrawing R${WithdrawAmount},00 for {User}", withdrawAmount, user);
         user.Balance -= withdrawAmount;
+        
+        var withdrawTransaction = new Transaction()
+        {
+            TransactionId = Guid.NewGuid().ToString(),
+            TransactionType = "Withdraw",
+            Amount = withdrawAmount,
+            Date = DateTime.Now
+        };
+        
+        user.UserHistory.Transactions.Add(withdrawTransaction);
 
         TempData["User"] = JsonConvert.SerializeObject(user);
 
