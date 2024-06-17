@@ -20,7 +20,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
                 LastName = lastName
             },
             Balance = balance,
-            UserHistory = new TransactionHistory()
+            AccountHistory = new TransactionHistory()
         };
 
         _logger.LogInformation("Account created! {FirstName} {LastName}, R${Balance},00", firstName, lastName, balance);
@@ -46,7 +46,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
             CurrentBalance = user.Balance
         };
 
-        var userTransactions = user.UserHistory;
+        var userTransactions = user.AccountHistory;
         userTransactions.Transactions.Add(depositTransaction);
     }
 
@@ -69,7 +69,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
             CurrentBalance = user.Balance
         };
 
-        var userTransactions = user.UserHistory;
+        var userTransactions = user.AccountHistory;
         userTransactions.Transactions.Add(withdrawTransaction);
     }
 }
