@@ -1,80 +1,127 @@
+@using PucBank.Models.Enums
 @model PucBank.Models.Account
 
-<div class="text-center">
-  <h1>Bem-vindo, @Model.Owner.FirstName @Model.Owner.LastName!</h1>
+
+<div class="d-flex flex-column justify-content-between h-100">
+    <div class="w-100">
+        <div class="text-center">
+            <h1>Bem-vindo, @Model.Owner.FirstName @Model.Owner.LastName!</h1>
+        </div>
+
+        <div class="d-flex mt-4 flex-column flex-md-row">
+            <div
+                class="d-flex flex-md-column flex-row flex-grow-1 justify-content-center justify-content-md-start mb-5 mb-md-0">
+                <div>
+                    <h3>O que deseja fazer hoje?</h3>
+                    <h5>Saldo: R$@Model.Balance,00</h5>
+                </div>
+
+                <div>
+                    <button type="button" id="depositModalButton" class="btn btn-success btn-sm">Depositar</button>
+                    <button type="button" id="withdrawModalButton" class="btn btn-danger btn-sm">Sacar</button>
+                </div>
+            </div>
+
+            <div class="flex-grow-1">
+                <h3 class="text-center">Histórico de transações</h3>
+
+                <div class="py-2">
+                    @if (Model.UserHistory.Transactions.Count == 0)
+                    {
+                        <div class="text-center">
+                            <p>Você ainda não possui transações.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var transaction in Model.UserHistory.Transactions)
+                        {
+                            if (transaction.TransactionType == TransactionsType.Deposit)
+                            {
+                                <div class="d-flex justify-content-between text-success">
+                                    <span>@transaction.Date.DateOnly</span>
+                                    <span>+ R$ @transaction.Amount</span>
+                                </div>
+                            }
+                            else if (transaction.TransactionType == TransactionsType.Withdraw)
+                            {
+                                <div class="d-flex justify-content-between text-danger">
+                                    <span>@transaction.Date.DateOnly</span>
+                                    <span>- R$ @transaction.Amount</span>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-primary btn-sm">Importar extrato</button>
+        <button type="submit" class="btn btn-primary btn-sm">Exportar extrato</button>
+    </div>
 </div>
 
-<div>
-  <h3>O que deseja fazer hoje?</h3>
-  <h5>Saldo: R$@Model.Balance,00</h5>
-</div>
 
-<div>
-  <button class="btn btn-success" data-toggle="modal" data-target="#depositModal">Depositar</button>
-  <button class="btn btn-danger" data-toggle="modal" data-target="#withdrawModal">Sacar</button>
-  <form method="post" action="@Url.Action("History", "Home")" style="display:inline;">
-    <button type="submit" class="btn btn-primary">Ver extrato</button>
-  </form>
-</div>
-
-<!-- Deposit Modal -->
 <div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="depositModalLabel">Deposit Amount</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form asp-action="Deposit" asp-controller="Home" method="post">
-        <div class="modal-body">
-          <input type="number" name="depositAmount" class="form-control" required>
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="depositModalLabel">Depósito</h5>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Deposit" asp-controller="Home" method="post">
+                    <div class="modal-body">
+                        <label for="depositAmount">Valor do depósito</label>
+                        <input type="number" name="depositAmount" class="form-control form-control-sm" required min="1"
+                            placeholder="110">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-success">Submit</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 
-<!-- Withdraw Modal -->
 <div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog" aria-labelledby="withdrawModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="withdrawModalLabel">Withdraw Amount</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <form asp-action="Withdraw" asp-controller="Home" method="post">
-        <div class="modal-body">
-          <input type="number" name="withdrawAmount" class="form-control" required>
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="withdrawModalLabel">Saque</h5>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Withdraw" asp-controller="Home" method="post">
+                    <div class="modal-body">
+                        <label for="withdrawAmount">Valor do saque</label>
+                        <input type="number" name="withdrawAmount" class="form-control form-control-sm" required min="1"
+                            placeholder="110">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+                        <button type="submit" class="btn btn-success">Enviar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-danger">Submit</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 
 @section Scripts
 {
-  <script>
-    $(document).ready(function () {
-      $('#depositModal').on('show.bs.modal', function (e) {
-        console.log('Deposit Modal is being shown');
-      });
-      $('#withdrawModal').on('show.bs.modal', function (e) {
-        console.log('Withdraw Modal is being shown');
-      });
-    });
-  </script>
+    <script>
+        $(document).ready(function () {
+            $("#depositModalButton").click(function () {
+                $("#depositModal").modal("show");
+            });
+            $("#withdrawModalButton").click(function () {
+                $("#withdrawModal").modal("show");
+            });
+        });
+    </script>
 }
