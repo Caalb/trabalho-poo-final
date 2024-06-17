@@ -1,9 +1,11 @@
 using System.Diagnostics;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Newtonsoft.Json;
+
 using PucBank.Models;
-using PucBank.Interfaces;
-using Microsoft.Extensions.Logging;
+using PucBank.Services.Interfaces;
 
 namespace PucBank.Controllers
 {
