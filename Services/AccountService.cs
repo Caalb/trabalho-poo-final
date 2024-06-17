@@ -41,9 +41,9 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         {
             TransactionId = Guid.NewGuid().ToString(),
             TransactionType = TransactionsType.Deposit,
-            Amount = depositAmount,
-            Date = DateTime.Now,
-            Balance = user.Balance
+            TransactionAmount = depositAmount,
+            TransactionDate = DateTime.Now,
+            CurrentBalance = user.Balance
         };
 
         var userTransactions = user.UserHistory;
@@ -64,9 +64,9 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         {
             TransactionId = Guid.NewGuid().ToString(),
             TransactionType = TransactionsType.Withdraw,
-            Amount = withdrawAmount,
-            Date = DateTime.Now,
-            Balance = user.Balance
+            TransactionAmount = withdrawAmount,
+            TransactionDate = DateTime.Now,
+            CurrentBalance = user.Balance
         };
 
         var userTransactions = user.UserHistory;

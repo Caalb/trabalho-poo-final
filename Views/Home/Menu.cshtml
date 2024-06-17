@@ -39,15 +39,17 @@
                             if (transaction.TransactionType == TransactionsType.Deposit)
                             {
                                 <div class="d-flex justify-content-between text-success">
-                                    <span>@transaction.Date.DateOnly</span>
-                                    <span>+ R$ @transaction.Amount</span>
+                                    <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    <span>+ R$ @transaction.TransactionAmount,00</span>
+                                    <span>Saldo atual: R$@transaction.CurrentBalance,00</span>
                                 </div>
                             }
                             else if (transaction.TransactionType == TransactionsType.Withdraw)
                             {
                                 <div class="d-flex justify-content-between text-danger">
-                                    <span>@transaction.Date.DateOnly</span>
-                                    <span>- R$ @transaction.Amount</span>
+                                    <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    <span>- R$@transaction.TransactionAmount,00</span>
+                                    <span>Saldo atual: R$@transaction.CurrentBalance,00</span>
                                 </div>
                             }
                         }
@@ -76,7 +78,7 @@
                     <div class="modal-body">
                         <label for="depositAmount">Valor do depósito</label>
                         <input type="number" name="depositAmount" class="form-control form-control-sm" required min="1"
-                            placeholder="110">
+                            placeholder="250">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
@@ -100,7 +102,7 @@
                     <div class="modal-body">
                         <label for="withdrawAmount">Valor do saque</label>
                         <input type="number" name="withdrawAmount" class="form-control form-control-sm" required min="1"
-                            placeholder="110">
+                            placeholder="250">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
