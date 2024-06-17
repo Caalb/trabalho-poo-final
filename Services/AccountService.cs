@@ -48,7 +48,8 @@ namespace PucBank.Services
                 TransactionId = Guid.NewGuid().ToString(),
                 TransactionType = TransactionsType.Deposit,
                 Amount = depositAmount,
-                Date = DateTime.Now
+                Date = DateTime.Now,
+                Balance = user.Balance
             };
 
             user.UserHistory.Transactions.Add(depositTransaction);
