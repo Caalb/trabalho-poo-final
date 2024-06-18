@@ -4,8 +4,8 @@ using PucBank.Models;
 
 namespace PucBank.Services.Interfaces;
 
-public interface IAccountService
+public interface IReceiptService
 {
-    TransactionHistory ImportReceipt(XmlDocument receipt);
-    XmlDocument ExportReceipt();
+    public TransactionHistory ImportReceipt(IFormFile receipt);
+    public XmlDocument ExportReceipt(TransactionHistory receipt);
 }

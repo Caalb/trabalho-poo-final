@@ -10,18 +10,11 @@ using PucBank.Services.Interfaces;
 
 namespace PucBank.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController(ILogger<HomeController> logger, IAccountService accountService, IReceiptService receiptService) : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly IAccountService _accountService;
-        private readonly IReceiptService _receiptService;
-
-        public HomeController(ILogger<HomeController> logger, IAccountService accountService, IReceiptService receiptService)
-        {
-            _logger = logger;
-            _accountService = accountService;
-            _receiptService = receiptService;
-        }
+        private readonly ILogger<HomeController> _logger = logger;
+        private readonly IAccountService _accountService = accountService;
+        private readonly IReceiptService _receiptService = receiptService;
 
         public IActionResult Index()
         {
@@ -114,8 +107,9 @@ namespace PucBank.Controllers
             }
         }
 
+        [HttpPost]
         [Route("Home/ImportHistory")]
-        public IActionResult ImportHistory(XmlDocument history)
+        public IActionResult ImportHistory(IFormFile history)
         {
             try
             {
@@ -129,6 +123,10 @@ namespace PucBank.Controllers
                 var receipt = _receiptService.ImportReceipt(history);
 
                 // Overwrites user properties based on new receipt (TransactionHistory)
+                user.AccountHistory = receipt;
+                user.Balance = receipt.GetBalance();
+
+                TempData["User"] = JsonConvert.SerializeObject(user);
 
                 return RedirectToAction("ShowMenu");
             }
@@ -138,10 +136,9 @@ namespace PucBank.Controllers
                 ModelState.AddModelError("", ex.Message);
                 return RedirectToAction("ShowMenu");
             }
-            return View();
         }
 
-         [Route("Home/ExportHistory")]
+        [Route("Home/ExportHistory")]
         public IActionResult ExportHistory()
         {
             try
@@ -153,11 +150,12 @@ namespace PucBank.Controllers
                 }
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
-                var transactions = user.TransactionHistory;
+                var transactions = user.AccountHistory;
 
-                // Exports
-                 _receiptService.ExportHistory(transactions);
-
+                // Exports current user TransactionHistory (transactions) as 
+                // an XML file and saves it to the user's "C:/" folder
+                var xml = _receiptService.ExportReceipt(transactions);
+                xml.Save("C:/receipt.xml");
 
                 return RedirectToAction("ShowMenu");
             }
@@ -167,7 +165,6 @@ namespace PucBank.Controllers
                 ModelState.AddModelError("", ex.Message);
                 return RedirectToAction("ShowMenu");
             }
-            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
