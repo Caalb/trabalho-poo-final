@@ -8,7 +8,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
 {
     private readonly ILogger<AccountService> _logger = logger;
 
-    public Account CreateAccount(string firstName, string lastName, int balance)
+    public Account CreateAccount(string firstName, string lastName, double balance)
     {
         _logger.LogInformation("Creating account for {FirstName} {LastName} with balance {Balance}", firstName, lastName, balance);
 
@@ -27,7 +27,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         return user;
     }
 
-    public void Deposit(Account user, int depositAmount)
+    public void Deposit(Account user, double depositAmount)
     {
         if (depositAmount <= 0)
         {
@@ -46,11 +46,11 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
             CurrentBalance = user.Balance
         };
 
-        var userTransactions = user.AccountHistory;
-        userTransactions.Transactions.Add(depositTransaction);
+        var history = user.AccountHistory;
+        history.Transactions.Add(depositTransaction);
     }
 
-    public void Withdraw(Account user, int withdrawAmount)
+    public void Withdraw(Account user, double withdrawAmount)
     {
         if (withdrawAmount <= 0 || withdrawAmount > user.Balance)
         {
@@ -60,7 +60,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         _logger.LogInformation("Withdrawing R${WithdrawAmount},00 for {User}", withdrawAmount, user);
         user.Balance -= withdrawAmount;
 
-        var withdrawTransaction = new Transaction
+        var transaction = new Transaction
         {
             TransactionId = Guid.NewGuid().ToString(),
             TransactionType = TransactionsType.Withdraw,
@@ -69,7 +69,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
             CurrentBalance = user.Balance
         };
 
-        var userTransactions = user.AccountHistory;
-        userTransactions.Transactions.Add(withdrawTransaction);
+        var history = user.AccountHistory;
+        history.Transactions.Add(transaction);
     }
 }
