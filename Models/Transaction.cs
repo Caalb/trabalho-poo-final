@@ -7,7 +7,7 @@ public class Transaction
   public string? TransactionId { get; set; }
   public TransactionsType TransactionType { get; set; }
   public string? TransactionTitle { get; set; }
-  public int TransactionAmount { get; set; }
+  public double TransactionAmount { get; set; }
   public DateTime TransactionDate { get; set; }
-  public int CurrentBalance { get; set; }
+  public double CurrentBalance { get; set; }
 }

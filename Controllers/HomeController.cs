@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Xml;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,13 @@ namespace PucBank.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IAccountService _accountService;
+        private readonly IReceiptService _receiptService;
 
-        public HomeController(ILogger<HomeController> logger, IAccountService accountService)
+        public HomeController(ILogger<HomeController> logger, IAccountService accountService, IReceiptService receiptService)
         {
             _logger = logger;
             _accountService = accountService;
+            _receiptService = receiptService;
         }
 
         public IActionResult Index()
@@ -27,7 +30,7 @@ namespace PucBank.Controllers
 
         [HttpPost]
         [Route("Home/CreateAccount")]
-        public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] int balance)
+        public IActionResult CreateAccount([FromForm] string firstName, [FromForm] string lastName, [FromForm] double balance)
         {
             try
             {
@@ -61,7 +64,7 @@ namespace PucBank.Controllers
 
         [HttpPost]
         [Route("Home/Deposit")]
-        public IActionResult Deposit([FromForm] int depositAmount)
+        public IActionResult Deposit([FromForm] double depositAmount)
         {
             try
             {
@@ -87,7 +90,7 @@ namespace PucBank.Controllers
 
         [HttpPost]
         [Route("Home/Withdraw")]
-        public IActionResult Withdraw([FromForm] int withdrawAmount)
+        public IActionResult Withdraw([FromForm] double withdrawAmount)
         {
             try
             {
@@ -111,9 +114,59 @@ namespace PucBank.Controllers
             }
         }
 
-        [Route("Home/History")]
-        public IActionResult History()
+        [Route("Home/ImportHistory")]
+        public IActionResult ImportHistory(XmlDocument history)
         {
+            try
+            {
+                var userJson = TempData["User"]?.ToString();
+                if (userJson == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                var user = JsonConvert.DeserializeObject<Account>(userJson);
+                var receipt = _receiptService.ImportReceipt(history);
+
+                // Overwrites user properties based on new receipt (TransactionHistory)
+
+                return RedirectToAction("ShowMenu");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error importing receipt");
+                ModelState.AddModelError("", ex.Message);
+                return RedirectToAction("ShowMenu");
+            }
+            return View();
+        }
+
+         [Route("Home/ExportHistory")]
+        public IActionResult ExportHistory()
+        {
+            try
+            {
+                var userJson = TempData["User"]?.ToString();
+                if (userJson == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                var user = JsonConvert.DeserializeObject<Account>(userJson);
+                var transactions = user.TransactionHistory;
+
+                // Exports
+                 _receiptService.ExportHistory(transactions);
+
+
+                return RedirectToAction("ShowMenu");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exporting receipt");
+                ModelState.AddModelError("", ex.Message);
+                return RedirectToAction("ShowMenu");
+            }
             return View();
         }
 
