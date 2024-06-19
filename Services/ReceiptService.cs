@@ -25,23 +25,36 @@ public class ReceiptService : IReceiptService
 
     public XmlDocument ExportReceipt(TransactionHistory receipt)
     {
-        // Convert the TransactionHistory object back to XmlDocument
         XmlDocument receiptXml = ConvertTransactionHistoryToXml(receipt);
-
         return receiptXml;
     }
 
-    private TransactionHistory ConvertXmlToTransactionHistory(XmlDocument receiptXml)
+    private XmlDocument ConvertTransactionHistoryToXml(TransactionHistory transactions)
     {
-        // Conversion logic here
-        return new TransactionHistory();
-    }
-
-    private XmlDocument ConvertTransactionHistoryToXml(TransactionHistory receipt)
-    {
-        // Conversion logic here
         XmlDocument document = new XmlDocument();
-        // Populate the XmlDocument with data from the TransactionHistory object
+
+        XmlElement root = document.CreateElement("Transactions");
+        document.AppendChild(root);
+
+        foreach (var transaction in transactions.Transactions)
+        {
+            XmlElement transactionElement = document.CreateElement("Transaction");
+
+            XmlElement dateElement = document.CreateElement("Date");
+            dateElement.InnerText = transaction.TransactionDate.ToString();
+            transactionElement.AppendChild(dateElement);
+
+            XmlElement typeElement = document.CreateElement("Type");
+            typeElement.InnerText = transaction.TransactionType.ToString();
+            transactionElement.AppendChild(typeElement);
+
+            XmlElement amountElement = document.CreateElement("Amount");
+            amountElement.InnerText = transaction.TransactionAmount.ToString();
+            transactionElement.AppendChild(amountElement);
+
+            root.AppendChild(transactionElement);
+        }
+
         return document;
     }
 }

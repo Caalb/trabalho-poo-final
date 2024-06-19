@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Xml;
+using System.Text;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -122,7 +123,6 @@ namespace PucBank.Controllers
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
                 var receipt = _receiptService.ImportReceipt(history);
 
-                // Overwrites user properties based on new receipt (TransactionHistory)
                 user.AccountHistory = receipt;
                 user.Balance = receipt.GetBalance();
 
@@ -138,31 +138,57 @@ namespace PucBank.Controllers
             }
         }
 
+        [HttpPost]
         [Route("Home/ExportHistory")]
         public IActionResult ExportHistory()
         {
             try
             {
                 var userJson = TempData["User"]?.ToString();
-                if (userJson == null)
-                {
-                    return RedirectToAction("Index");
-                }
+             
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
                 var transactions = user.AccountHistory;
 
-                // Exports current user TransactionHistory (transactions) as 
-                // an XML file and saves it to the user's "C:/" folder
-                var xml = _receiptService.ExportReceipt(transactions);
-                xml.Save("C:/receipt.xml");
+                if (transactions == null)
+                {
+                    _logger.LogWarning("No transactions found for the user.");
+                    ModelState.AddModelError("", "No transactions to export.");
+                    TempData.Keep("User");
+                    return RedirectToAction("ShowMenu");
+                }
 
-                return RedirectToAction("ShowMenu");
+                var xml = _receiptService.ExportReceipt(transactions);
+
+                if (xml == null)
+                {
+                    _logger.LogError("Error generating XML.");
+                    ModelState.AddModelError("", "Error generating export file.");
+                    TempData.Keep("User");
+                    return RedirectToAction("ShowMenu");
+                }
+
+                var xmlString = xml.OuterXml;
+                if (string.IsNullOrEmpty(xmlString))
+                {
+                    _logger.LogError("XML string is empty.");
+                    ModelState.AddModelError("", "Generated XML is empty.");
+                    TempData.Keep("User");
+                    return RedirectToAction("ShowMenu");
+                }
+
+                var bytes = Encoding.UTF8.GetBytes(xmlString);
+                var stream = new MemoryStream(bytes);
+
+                TempData.Keep("User");
+
+                return File(stream, "application/xml", "receipt.xml");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error exporting receipt");
                 ModelState.AddModelError("", ex.Message);
+                TempData.Keep("User");
                 return RedirectToAction("ShowMenu");
             }
         }
