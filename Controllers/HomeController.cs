@@ -1,21 +1,25 @@
 using System.Diagnostics;
 using System.Xml;
 using System.Text;
-
 using Microsoft.AspNetCore.Mvc;
-
 using Newtonsoft.Json;
-
 using PucBank.Models;
 using PucBank.Services.Interfaces;
 
 namespace PucBank.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, IAccountService accountService, IReceiptService receiptService) : Controller
+    public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger = logger;
-        private readonly IAccountService _accountService = accountService;
-        private readonly IReceiptService _receiptService = receiptService;
+        private readonly ILogger<HomeController> _logger;
+        private readonly IAccountService _accountService;
+        private readonly IReceiptService _receiptService;
+
+        public HomeController(ILogger<HomeController> logger, IAccountService accountService, IReceiptService receiptService)
+        {
+            _logger = logger;
+            _accountService = accountService;
+            _receiptService = receiptService;
+        }
 
         public IActionResult Index()
         {
@@ -114,8 +118,6 @@ namespace PucBank.Controllers
         {
             try
             {
-                _logger.LogInformation("ImportHistory method started");
-
                 var userJson = TempData["User"]?.ToString();
                 if (userJson == null)
                 {
@@ -124,17 +126,14 @@ namespace PucBank.Controllers
                 }
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
-                _logger.LogInformation("User data deserialized from TempData");
 
-                var receipt = _receiptService.ImportReceipt(history, user.AccountHistory);
-                _logger.LogInformation("Receipt imported");
+                var receipt = _receiptService.ImportReceipt(history);
 
                 user.AccountHistory = receipt;
-                user.Balance = receipt.GetBalance();
+                user.Balance = receipt.GetCurrentBalance();
                 _logger.LogInformation("User data updated with imported receipt");
 
                 TempData["User"] = JsonConvert.SerializeObject(user);
-                _logger.LogInformation("Updated user data serialized back to TempData");
 
                 return RedirectToAction("ShowMenu");
             }
@@ -153,7 +152,6 @@ namespace PucBank.Controllers
             try
             {
                 var userJson = TempData["User"]?.ToString();
-
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
                 var transactions = user.AccountHistory;
@@ -190,7 +188,9 @@ namespace PucBank.Controllers
 
                 TempData.Keep("User");
 
-                return File(stream, "application/xml", "receipt.xml");
+                var i = 0;
+                i++;
+                return File(stream, "application/xml", $"receipt_{i}.xml");
             }
             catch (Exception ex)
             {

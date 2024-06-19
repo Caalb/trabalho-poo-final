@@ -6,6 +6,6 @@ namespace PucBank.Services.Interfaces;
 
 public interface IReceiptService
 {
-    TransactionHistory ImportReceipt(IFormFile receiptFile, TransactionHistory currentHistory);
+    TransactionHistory ImportReceipt(IFormFile receiptFile);
     XmlDocument ExportReceipt(TransactionHistory receipt);
 }

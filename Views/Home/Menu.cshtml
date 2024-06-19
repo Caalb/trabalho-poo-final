@@ -36,7 +36,7 @@
                     {
                         @foreach (var transaction in Model.AccountHistory.Transactions)
                         {
-                            if (transaction.TransactionType == TransactionsType.Deposit)
+                            if (transaction.TransactionType == TransactionType.Deposit)
                             {
                                 <div class="d-flex justify-content-between text-success">
                                     <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>
@@ -44,7 +44,7 @@
                                     <span>Saldo atual: R$@transaction.CurrentBalance,00</span>
                                 </div>
                             }
-                            else if (transaction.TransactionType == TransactionsType.Withdraw)
+                            else if (transaction.TransactionType == TransactionType.Withdraw)
                             {
                                 <div class="d-flex justify-content-between text-danger">
                                     <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>

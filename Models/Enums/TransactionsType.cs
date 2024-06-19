@@ -1,6 +1,6 @@
 namespace PucBank.Models.Enums;
 
-public enum TransactionsType
+public enum TransactionType
 {
     Deposit,
     Withdraw
