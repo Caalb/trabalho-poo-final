@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http;
-using System.IO;
 using System.Xml;
 using PucBank.Models;
 using PucBank.Services.Interfaces;
@@ -8,7 +6,7 @@ namespace PucBank.Services;
 
 public class ReceiptService : IReceiptService
 {
-    public TransactionHistory ImportReceipt(IFormFile receiptFile)
+    public TransactionHistory ImportReceipt(IFormFile receiptFile, TransactionHistory currentHistory)
     {
         XmlDocument receiptXml = new();
         if (receiptFile != null && receiptFile.Length > 0)
@@ -17,10 +15,18 @@ public class ReceiptService : IReceiptService
             receiptXml.Load(stream);
         }
 
-        // Convert the XmlDocument to TransactionHistory object
-        TransactionHistory transactionHistory = ConvertXmlToTransactionHistory(receiptXml);
+        List<Transaction> newTransactions = ConvertXmlToTransactionList(receiptXml);
 
-        return transactionHistory;
+        currentHistory.Transactions.AddRange(newTransactions);
+
+        return currentHistory;
+    }
+
+    private List<Transaction> ConvertXmlToTransactionList(XmlDocument receiptXml)
+    {
+        List<Transaction> transactions = new List<Transaction>();
+
+        return transactions;
     }
 
     public XmlDocument ExportReceipt(TransactionHistory receipt)

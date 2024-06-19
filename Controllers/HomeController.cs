@@ -114,19 +114,27 @@ namespace PucBank.Controllers
         {
             try
             {
+                _logger.LogInformation("ImportHistory method started");
+
                 var userJson = TempData["User"]?.ToString();
                 if (userJson == null)
                 {
+                    _logger.LogWarning("User data not found in TempData");
                     return RedirectToAction("Index");
                 }
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
-                var receipt = _receiptService.ImportReceipt(history);
+                _logger.LogInformation("User data deserialized from TempData");
+
+                var receipt = _receiptService.ImportReceipt(history, user.AccountHistory);
+                _logger.LogInformation("Receipt imported");
 
                 user.AccountHistory = receipt;
                 user.Balance = receipt.GetBalance();
+                _logger.LogInformation("User data updated with imported receipt");
 
                 TempData["User"] = JsonConvert.SerializeObject(user);
+                _logger.LogInformation("Updated user data serialized back to TempData");
 
                 return RedirectToAction("ShowMenu");
             }
@@ -145,7 +153,7 @@ namespace PucBank.Controllers
             try
             {
                 var userJson = TempData["User"]?.ToString();
-             
+
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
                 var transactions = user.AccountHistory;
