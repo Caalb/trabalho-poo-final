@@ -67,36 +67,42 @@ public class ReceiptService : IReceiptService
         TransactionHistory transactions = new();
 
         XmlNodeList? transactionNodes = receiptXml.SelectNodes("//Transaction");
-
-        foreach (XmlNode transactionNode in transactionNodes)
+        if (transactionNodes != null)
         {
-            Transaction transaction = new();
-
-            XmlNode? dateNode = transactionNode.SelectSingleNode("Date");
-            if (dateNode != null && DateTime.TryParse(dateNode.InnerText, out DateTime transactionDate))
+            foreach (XmlNode transactionNode in transactionNodes)
             {
-                transaction.TransactionDate = transactionDate;
-            }
+                Transaction newTransaction = new();
 
-            XmlNode? typeNode = transactionNode.SelectSingleNode("Type");
-            if (typeNode != null && Enum.TryParse(typeNode.InnerText, out TransactionType transactionType))
-            {
-                transaction.TransactionType = transactionType;
-            }
+                // Parse the Date element
+                XmlNode? dateNode = transactionNode.SelectSingleNode("Date");
+                if (dateNode != null)
+                {
+                    newTransaction.TransactionDate = DateTime.Parse(dateNode.InnerText);
+                }
 
-            XmlNode? amountNode = transactionNode.SelectSingleNode("Amount");
-            if (amountNode != null && double.TryParse(amountNode.InnerText, out double transactionAmount))
-            {
-                transaction.TransactionAmount = transactionAmount;
-            }
+                // Parse the Type element
+                XmlNode? typeNode = transactionNode.SelectSingleNode("Type");
+                if (typeNode != null)
+                {
+                    newTransaction.TransactionType = Enum.Parse<TransactionType>(typeNode.InnerText);
+                }
 
-            XmlNode? balanceNode = transactionNode.SelectSingleNode("CurrentBalance");
-            if (balanceNode != null && double.TryParse(balanceNode.InnerText, out double currentBalance))
-            {
-                transaction.CurrentBalance = currentBalance;
-            }
+                // Parse the Amount element
+                XmlNode? amountNode = transactionNode.SelectSingleNode("Amount");
+                if (amountNode != null)
+                {
+                    newTransaction.TransactionAmount = double.Parse(amountNode.InnerText);
+                }
 
-            transactions.Transactions.Add(transaction);
+                // Parse the CurrentBalance element
+                XmlNode? balanceNode = transactionNode.SelectSingleNode("CurrentBalance");
+                if (balanceNode != null)
+                {
+                    newTransaction.CurrentBalance = double.Parse(balanceNode.InnerText);
+                }
+
+                transactions.Transactions.Add(newTransaction);
+            }
         }
 
         return transactions;

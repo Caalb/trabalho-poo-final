@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using PucBank.Models;
 using PucBank.Services.Interfaces;
+using PucBank.Models.Enums;
 
 namespace PucBank.Controllers
 {
@@ -62,7 +63,7 @@ namespace PucBank.Controllers
 
         [HttpPost]
         [Route("Home/Deposit")]
-        public IActionResult Deposit([FromForm] double depositAmount)
+        public IActionResult Deposit([FromForm] double depositAmount, [FromForm] string transactionTitle)
         {
             try
             {
@@ -73,7 +74,7 @@ namespace PucBank.Controllers
                 }
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
-                _accountService.Deposit(user, depositAmount);
+                _accountService.Deposit(user, depositAmount, transactionTitle);
                 TempData["User"] = JsonConvert.SerializeObject(user);
 
                 return RedirectToAction("ShowMenu");
@@ -88,7 +89,7 @@ namespace PucBank.Controllers
 
         [HttpPost]
         [Route("Home/Withdraw")]
-        public IActionResult Withdraw([FromForm] double withdrawAmount)
+        public IActionResult Withdraw([FromForm] double withdrawAmount, [FromForm] string transactionTitle)
         {
             try
             {
@@ -99,7 +100,7 @@ namespace PucBank.Controllers
                 }
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
-                _accountService.Withdraw(user, withdrawAmount);
+                _accountService.Withdraw(user, withdrawAmount, transactionTitle);
                 TempData["User"] = JsonConvert.SerializeObject(user);
 
                 return RedirectToAction("ShowMenu");
@@ -217,21 +218,20 @@ namespace PucBank.Controllers
 
                 var user = JsonConvert.DeserializeObject<Account>(userJson);
 
-                // Encontra a transação específica
                 var transaction = user.AccountHistory.Transactions.FirstOrDefault(t => t.TransactionId == transactionId);
                 if (transaction == null)
                 {
-                    _logger.LogWarning($"Transaction with ID {transactionId} not found.");
+                    _logger.LogWarning("Transaction with ID {TransactionId} not found.", transactionId);
                     ModelState.AddModelError("", "Transaction not found.");
                     TempData["User"] = JsonConvert.SerializeObject(user);
                     return RedirectToAction("ShowMenu");
                 }
 
-                double currentBalanceWithoutTransaction = transaction.TransactionType == Models.Enums.TransactionType.Deposit ?
-                user.Balance - transaction.TransactionAmount :
-                user.Balance + transaction.TransactionAmount;
+                var currentBalanceWithoutTransaction = transaction.TransactionType == TransactionType.Deposit ?
+                    user.Balance - transaction.TransactionAmount :
+                    user.Balance + transaction.TransactionAmount;
 
-                double newPotentialBalance = transaction.TransactionType == Models.Enums.TransactionType.Deposit ?
+                var newPotentialBalance = transaction.TransactionType == TransactionType.Deposit ?
                     currentBalanceWithoutTransaction + amount :
                     currentBalanceWithoutTransaction - amount;
 

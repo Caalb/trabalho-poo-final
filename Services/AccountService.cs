@@ -27,7 +27,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         return user;
     }
 
-    public void Deposit(Account user, double depositAmount)
+    public void Deposit(Account user, double depositAmount, string transactionTitle)
     {
         if (depositAmount <= 0)
         {
@@ -41,6 +41,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         {
             TransactionId = Guid.NewGuid().ToString(),
             TransactionType = TransactionType.Deposit,
+            TransactionTitle = transactionTitle,
             TransactionAmount = depositAmount,
             TransactionDate = DateTime.Now,
             CurrentBalance = user.Balance
@@ -50,7 +51,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         history.Transactions.Add(depositTransaction);
     }
 
-    public void Withdraw(Account user, double withdrawAmount)
+    public void Withdraw(Account user, double withdrawAmount, string transactionTitle)
     {
         if (withdrawAmount <= 0 || withdrawAmount > user.Balance)
         {
@@ -64,6 +65,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         {
             TransactionId = Guid.NewGuid().ToString(),
             TransactionType = TransactionType.Withdraw,
+            TransactionTitle = transactionTitle,
             TransactionAmount = withdrawAmount,
             TransactionDate = DateTime.Now,
             CurrentBalance = user.Balance

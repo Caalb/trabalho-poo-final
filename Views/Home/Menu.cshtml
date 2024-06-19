@@ -42,8 +42,8 @@
                                     <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>
                                     <span>+ R$@transaction.TransactionAmount,00</span>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <span>Saldo atual: R$@transaction.CurrentBalance,00</span>
-                                        <i class="fas fa-edit" style="cursor: pointer" data-id="@transaction.TransactionId" data-amount="@transaction.TransactionAmount"></i>
+                                        <i class="fas fa-edit" style="cursor: pointer" data-id="@transaction.TransactionId"
+                                            data-amount="@transaction.TransactionAmount"></i>
                                     </div>
                                 </div>
                             }
@@ -53,8 +53,8 @@
                                     <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>
                                     <span>- R$@transaction.TransactionAmount,00</span>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <span>Saldo atual: R$@transaction.CurrentBalance,00</span>
-                                        <i class="fas fa-edit" style="cursor: pointer" data-id="@transaction.TransactionId" data-amount="@transaction.TransactionAmount"></i>
+                                        <i class="fas fa-edit" style="cursor: pointer" data-id="@transaction.TransactionId"
+                                            data-amount="@transaction.TransactionAmount"></i>
                                     </div>
                                 </div>
                             }
@@ -76,27 +76,28 @@
     </div>
 </div>
 
-<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editTransactionModalLabel">Editar Transação</h5>
-      </div>
-      <form asp-action="EditTransaction" method="post">
-        <div class="modal-body">
-          <input type="hidden" id="transactionId" name="TransactionId" />
-          <div class="form-group">
-            <label for="transactionAmount">Valor</label>
-            <input type="number" class="form-control" id="transactionAmount" name="Amount" required>
-          </div>
+<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTransactionModalLabel">Editar Transação</h5>
+            </div>
+            <form asp-action="EditTransaction" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="transactionId" name="TransactionId" />
+                    <div class="form-group">
+                        <label for="transactionAmount">Valor</label>
+                        <input type="number" class="form-control" id="transactionAmount" name="Amount" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-        </div>
-      </form>
     </div>
-  </div>
 </div>
 
 <div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel"
@@ -159,8 +160,8 @@
             });
         });
 
-        $(document).ready(function() {
-            $('.fa-edit').click(function() {
+        $(document).ready(function () {
+            $('.fa-edit').click(function () {
                 const transactionId = $(this).data('id');
                 const transactionAmount = $(this).data('amount');
 
