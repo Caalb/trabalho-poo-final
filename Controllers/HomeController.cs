@@ -201,6 +201,63 @@ namespace PucBank.Controllers
             }
         }
 
+
+        [HttpPost]
+        [Route("Home/EditTransaction")]
+        public IActionResult EditTransaction([FromForm] string transactionId, [FromForm] double amount)
+        {
+            try
+            {
+                var userJson = TempData["User"]?.ToString();
+                if (userJson == null)
+                {
+                    _logger.LogWarning("User data not found in TempData");
+                    return RedirectToAction("Index");
+                }
+
+                var user = JsonConvert.DeserializeObject<Account>(userJson);
+
+                // Encontra a transação específica
+                var transaction = user.AccountHistory.Transactions.FirstOrDefault(t => t.TransactionId == transactionId);
+                if (transaction == null)
+                {
+                    _logger.LogWarning($"Transaction with ID {transactionId} not found.");
+                    ModelState.AddModelError("", "Transaction not found.");
+                    TempData["User"] = JsonConvert.SerializeObject(user);
+                    return RedirectToAction("ShowMenu");
+                }
+
+                double currentBalanceWithoutTransaction = transaction.TransactionType == Models.Enums.TransactionType.Deposit ?
+                user.Balance - transaction.TransactionAmount :
+                user.Balance + transaction.TransactionAmount;
+
+                double newPotentialBalance = transaction.TransactionType == Models.Enums.TransactionType.Deposit ?
+                    currentBalanceWithoutTransaction + amount :
+                    currentBalanceWithoutTransaction - amount;
+
+                if (newPotentialBalance < 0)
+                {
+                    _logger.LogWarning("Editing this transaction would result in a negative balance.");
+                    ModelState.AddModelError("", "Editing this transaction would result in a negative balance.");
+                    TempData["User"] = JsonConvert.SerializeObject(user);
+                    return RedirectToAction("ShowMenu");
+                }
+
+                transaction.CurrentBalance = newPotentialBalance;
+                user.Balance = newPotentialBalance;
+                transaction.TransactionAmount = amount;
+
+                TempData["User"] = JsonConvert.SerializeObject(user);
+                return RedirectToAction("ShowMenu");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error editing transaction");
+                ModelState.AddModelError("", ex.Message);
+                return RedirectToAction("ShowMenu");
+            }
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("Home/Error")]
         public IActionResult Error()
