@@ -1,0 +1,17 @@
+@model PucBank.Models.Transaction
+
+@if (Model == null)
+{
+  <div class="alert alert-warning">Transação não encontrada.</div>
+}
+else
+{
+  <div>
+    <p><strong>Id:</strong> @Model.TransactionId</p>
+    <p><strong>Nome:</strong> @Model.TransactionTitle</p>
+    <p><strong>Tipo:</strong> @Model.TransactionType</p>
+    <p><strong>Valor:</strong> @Model.TransactionAmount</p>
+    <p><strong>Data:</strong> @Model.TransactionDate</p>
+    <p><strong>Saldo atual:</strong> @Model.CurrentBalance</p>
+  </div>
+}
