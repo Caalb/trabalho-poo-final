@@ -188,11 +188,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
 
             TempData.Keep("User");
 
-            int i = HttpContext.Session.GetInt32("ReceiptCounter") ?? 0;
-            i++;
-            HttpContext.Session.SetInt32("ReceiptCounter", i);
-
-            return File(stream, "application/xml", $"receipt_{i}.xml");
+            return File(stream, "application/xml", $"extrato.xml");
         }
         catch (Exception ex)
         {
