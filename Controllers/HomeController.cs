@@ -258,6 +258,48 @@ namespace PucBank.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("Home/DeleteTransaction")]
+        public IActionResult DeleteTransaction([FromForm] string transactionId)
+        {
+            try
+            {
+                var userJson = TempData["User"]?.ToString();
+                if (userJson == null)
+                {
+                    _logger.LogWarning("User data not found in TempData");
+                    return RedirectToAction("Index");
+                }
+
+                var user = JsonConvert.DeserializeObject<Account>(userJson);
+
+                var transaction = user.AccountHistory.Transactions.FirstOrDefault(t => t.TransactionId == transactionId);
+                if (transaction == null)
+                {
+                    _logger.LogWarning("Transaction with ID {TransactionId} not found.", transactionId);
+                    ModelState.AddModelError("", "Transaction not found.");
+                    TempData["User"] = JsonConvert.SerializeObject(user);
+                    return RedirectToAction("ShowMenu");
+                }
+
+                var currentBalanceWithoutTransaction = transaction.TransactionType == TransactionType.Deposit ?
+                    user.Balance - transaction.TransactionAmount :
+                    user.Balance + transaction.TransactionAmount;
+
+                user.Balance = currentBalanceWithoutTransaction;
+                user.AccountHistory.Transactions.Remove(transaction);
+
+                TempData["User"] = JsonConvert.SerializeObject(user);
+                return RedirectToAction("ShowMenu");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting transaction");
+                ModelState.AddModelError("", ex.Message);
+                return RedirectToAction("ShowMenu");
+            }
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [Route("Home/Error")]
         public IActionResult Error()
