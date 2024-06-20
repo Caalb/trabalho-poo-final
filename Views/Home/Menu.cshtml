@@ -12,13 +12,15 @@
             <div
                 class="d-flex flex-md-column flex-row flex-grow-1 justify-content-center justify-content-md-start mb-5 mb-md-0">
                 <div>
-                    <h3>O que deseja fazer hoje?</h3>
+                    <h3>O que deseja fazer hoje, @Model.Owner.FirstName?</h3>
                     <h5>Saldo: R$@Model.Balance,00</h5>
                 </div>
 
                 <div>
                     <button type="button" id="depositModalButton" class="btn btn-success btn-sm">Depositar</button>
                     <button type="button" id="withdrawModalButton" class="btn btn-danger btn-sm">Sacar</button>
+                    <button type="button" id="searchTransactionModalButton" class="btn btn-primary btn-sm">Buscar
+                        Transação</button>
                 </div>
             </div>
 
@@ -26,7 +28,7 @@
                 <h3 class="text-center">Histórico de transações</h3>
 
                 <div class="py-2">
-                    @if (Model.UserHistory.Transactions.Count == 0)
+                    @if (Model.AccountHistory.Transactions.Count == 0)
                     {
                         <div class="text-center">
                             <p>Você ainda não possui transações.</p>
@@ -34,20 +36,52 @@
                     }
                     else
                     {
-                        @foreach (var transaction in Model.UserHistory.Transactions)
+                        @foreach (var transaction in Model.AccountHistory.Transactions)
                         {
-                            if (transaction.TransactionType == TransactionsType.Deposit)
+                            if (transaction.TransactionType == TransactionType.Deposit)
                             {
                                 <div class="d-flex justify-content-between text-success">
-                                    <span>@transaction.Date.DateOnly</span>
-                                    <span>+ R$ @transaction.Amount</span>
+                                    <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    <div class="d-flex gap-5 align-items-center">
+                                        <p class="m-0">+ R$@transaction.TransactionAmount,00</p>
+
+                                        <div class="d-flex gap-2">
+                                            <p class="m-0">
+                                                <i class="fas fa-edit text-dark" style="cursor: pointer"
+                                                    data-id="@transaction.TransactionId"
+                                                    data-amount="@transaction.TransactionAmount"></i>
+                                            </p>
+
+                                            <p class="m-0">
+                                                <i class="fas fa-trash text-danger" style="cursor: pointer"
+                                                    data-id="@transaction.TransactionId"
+                                                    data-id="@transaction.TransactionAmount"></i>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             }
-                            else if (transaction.TransactionType == TransactionsType.Withdraw)
+                            else if (transaction.TransactionType == TransactionType.Withdraw)
                             {
                                 <div class="d-flex justify-content-between text-danger">
-                                    <span>@transaction.Date.DateOnly</span>
-                                    <span>- R$ @transaction.Amount</span>
+                                    <span>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</span>
+                                    <div class="d-flex gap-5 align-items-center">
+                                        <p class="m-0">- R$@transaction.TransactionAmount,00</p>
+
+                                        <div class="d-flex gap-2">
+                                            <p class="m-0">
+                                                <i class="fas fa-edit text-dark" style="cursor: pointer"
+                                                    data-id="@transaction.TransactionId"
+                                                    data-amount="@transaction.TransactionAmount"></i>
+                                            </p>
+
+                                            <p class="m-0">
+                                                <i class="fas fa-trash text-danger" style="cursor: pointer"
+                                                    data-id="@transaction.TransactionId"
+                                                    data-id="@transaction.TransactionAmount"></i>
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             }
                         }
@@ -58,11 +92,40 @@
     </div>
 
     <div class="d-flex justify-content-end gap-2">
-        <button type="submit" class="btn btn-primary btn-sm">Importar extrato</button>
-        <button type="submit" class="btn btn-primary btn-sm">Exportar extrato</button>
+        <form id="importForm" asp-action="ImportHistory" asp-controller="Home" method="post"
+            enctype="multipart/form-data">
+            <input type="file" id="fileInput" name="history" accept=".xml" style="display: none;">
+            <button type="button" id="importButton" class="btn btn-primary btn-sm">Importar extrato</button>
+        </form>
+        <form asp-action="ExportHistory" asp-controller="Home" method="post">
+            <button type="submit" class="btn btn-primary btn-sm">Exportar extrato</button>
+        </form>
     </div>
 </div>
 
+<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-labelledby="editTransactionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTransactionModalLabel">Editar Transação</h5>
+            </div>
+            <form asp-action="EditTransaction" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="transactionId" name="TransactionId" />
+                    <div class="form-group">
+                        <label for="transactionAmount">Valor</label>
+                        <input type="number" class="form-control" id="transactionAmount" name="Amount" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <div class="modal fade" id="depositModal" tabindex="-1" role="dialog" aria-labelledby="depositModalLabel"
     aria-hidden="true">
@@ -74,15 +137,67 @@
             <div class="modal-body">
                 <form asp-action="Deposit" asp-controller="Home" method="post">
                     <div class="modal-body">
+                        <label for="depositAmount">Nome do depósito</label>
+                        <input type="text" name="depositTitle" class="form-control form-control-sm" required min="1"
+                            placeholder="Pagamento de salário">
                         <label for="depositAmount">Valor do depósito</label>
                         <input type="number" name="depositAmount" class="form-control form-control-sm" required min="1"
-                            placeholder="110">
+                            placeholder="250">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
                         <button type="submit" class="btn btn-success">Enviar</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="searchTransactionModal" tabindex="-1" aria-labelledby="searchTransactionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchTransactionModalLabel">Buscar Transação</h5>
+            </div>
+            <div class="modal-body">
+                <form id="searchTransactionForm" asp-action="SearchTransaction" asp-controller="Home" method="post">
+                    <div class="form-group">
+                        <label for="transactionTitle">Título da Transação</label>
+                        <input type="text" class="form-control" id="transactionTitle" name="transactionTitle" required>
+                    </div>
+                </form>
+                <div id="transactionResult"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary" form="searchTransactionForm">Buscar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="searchTransactionModal" tabindex="-1" aria-labelledby="searchTransactionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchTransactionModalLabel">Buscar Transação</h5>
+            </div>
+            <div class="modal-body">
+                <form id="searchTransactionForm" asp-action="SearchTransaction" asp-controller="Home" method="post">
+                    <div class="form-group">
+                        <label for="transactionTitle">Título da Transação</label>
+                        <input type="text" class="form-control" id="transactionTitle" name="transactionTitle" required>
+                    </div>
+                </form>
+                <div id="transactionResult"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary" form="searchTransactionForm">Buscar</button>
             </div>
         </div>
     </div>
@@ -98,9 +213,12 @@
             <div class="modal-body">
                 <form asp-action="Withdraw" asp-controller="Home" method="post">
                     <div class="modal-body">
+                        <label for="depositAmount">Nome do saque</label>
+                        <input type="text" name="depositTitle" class="form-control form-control-sm" required min="1"
+                            placeholder="Gastos com fármacia">
                         <label for="withdrawAmount">Valor do saque</label>
                         <input type="number" name="withdrawAmount" class="form-control form-control-sm" required min="1"
-                            placeholder="110">
+                            placeholder="250">
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
@@ -112,15 +230,85 @@
     </div>
 </div>
 
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <form asp-action="DeleteTransaction" asp-controller="Home" method="post">
+                <input type="hidden" id="transactionId" name="TransactionId" />
+                <div class="modal-body">
+                    Tem certeza de que deseja excluir esta transação?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts
 {
     <script>
+        document.getElementById('importButton').addEventListener('click', function () {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function () {
+            if (this.files.length > 0) {
+                document.getElementById('importForm').submit();
+            }
+        });
+
         $(document).ready(function () {
             $("#depositModalButton").click(function () {
                 $("#depositModal").modal("show");
             });
             $("#withdrawModalButton").click(function () {
                 $("#withdrawModal").modal("show");
+            });
+            $("#searchTransactionModalButton").click(function () {
+                $("#searchTransactionModal").modal("show");
+            });
+
+            $('.fa-edit').click(function () {
+                const transactionId = $(this).data('id');
+                const transactionAmount = $(this).data('amount');
+
+                $('#transactionId').val(transactionId);
+                $('#transactionAmount').val(transactionAmount);
+
+                $('#editTransactionModal').modal('show');
+            });
+
+            $('.fa-trash').click(function () {
+                const transactionId = $(this).data('id');
+                $('#deleteTransactionId').val(transactionId);
+                $('#deleteConfirmationModal').modal('show');
+            });
+
+            $("#searchTransactionForm").submit(function (event) {
+                event.preventDefault();
+                $.post({
+                    url: $(this).attr("action"),
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success === false) {
+                            $("#transactionResult").html('<div class="alert alert-warning">' + response.message + '</div>');
+                        } else {
+                            $("#transactionResult").html(response);
+                        }
+                    },
+                    error: function () {
+                        $("#transactionResult").html('<div class="alert alert-danger">Ocorreu um erro ao buscar pela transação.</div>');
+                    }
+                });
             });
         });
     </script>

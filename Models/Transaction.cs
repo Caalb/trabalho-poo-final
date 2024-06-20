@@ -5,8 +5,9 @@ namespace PucBank.Models;
 public class Transaction
 {
   public string? TransactionId { get; set; }
-  public TransactionsType TransactionType { get; set; }
-  public int Amount { get; set; }
-  public DateTime Date { get; set; }
-  public int Balance { get; set; }
+  public TransactionType TransactionType { get; set; }
+  public string? TransactionTitle { get; set; }
+  public double TransactionAmount { get; set; }
+  public DateTime TransactionDate { get; set; }
+  public double CurrentBalance { get; set; }
 }

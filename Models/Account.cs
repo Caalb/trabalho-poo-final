@@ -7,7 +7,7 @@ public class Account
   [Required]
   public Owner Owner { get; set; } = new();
   [Required]
-  public int Balance { get; set; }
+  public double Balance { get; set; }
 
-  public TransactionHistory UserHistory { get; set; } = new();
+  public TransactionHistory AccountHistory { get; set; } = new();
 }

@@ -8,7 +8,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
 {
     private readonly ILogger<AccountService> _logger = logger;
 
-    public Account CreateAccount(string firstName, string lastName, int balance)
+    public Account CreateAccount(string firstName, string lastName, double balance)
     {
         _logger.LogInformation("Creating account for {FirstName} {LastName} with balance {Balance}", firstName, lastName, balance);
 
@@ -20,14 +20,14 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
                 LastName = lastName
             },
             Balance = balance,
-            UserHistory = new TransactionHistory()
+            AccountHistory = new TransactionHistory()
         };
 
         _logger.LogInformation("Account created! {FirstName} {LastName}, R${Balance},00", firstName, lastName, balance);
         return user;
     }
 
-    public void Deposit(Account user, int depositAmount)
+    public void Deposit(Account user, double depositAmount, string transactionTitle)
     {
         if (depositAmount <= 0)
         {
@@ -40,17 +40,18 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         var depositTransaction = new Transaction
         {
             TransactionId = Guid.NewGuid().ToString(),
-            TransactionType = TransactionsType.Deposit,
-            Amount = depositAmount,
-            Date = DateTime.Now,
-            Balance = user.Balance
+            TransactionType = TransactionType.Deposit,
+            TransactionTitle = transactionTitle,
+            TransactionAmount = depositAmount,
+            TransactionDate = DateTime.Now,
+            CurrentBalance = user.Balance
         };
 
-        var userTransactions = user.UserHistory;
-        userTransactions.Transactions.Add(depositTransaction);
+        var history = user.AccountHistory;
+        history.Transactions.Add(depositTransaction);
     }
 
-    public void Withdraw(Account user, int withdrawAmount)
+    public void Withdraw(Account user, double withdrawAmount, string transactionTitle)
     {
         if (withdrawAmount <= 0 || withdrawAmount > user.Balance)
         {
@@ -60,16 +61,17 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
         _logger.LogInformation("Withdrawing R${WithdrawAmount},00 for {User}", withdrawAmount, user);
         user.Balance -= withdrawAmount;
 
-        var withdrawTransaction = new Transaction
+        var transaction = new Transaction
         {
             TransactionId = Guid.NewGuid().ToString(),
-            TransactionType = TransactionsType.Withdraw,
-            Amount = withdrawAmount,
-            Date = DateTime.Now,
-            Balance = user.Balance
+            TransactionType = TransactionType.Withdraw,
+            TransactionTitle = transactionTitle,
+            TransactionAmount = withdrawAmount,
+            TransactionDate = DateTime.Now,
+            CurrentBalance = user.Balance
         };
 
-        var userTransactions = user.UserHistory;
-        userTransactions.Transactions.Add(withdrawTransaction);
+        var history = user.AccountHistory;
+        history.Transactions.Add(transaction);
     }
 }

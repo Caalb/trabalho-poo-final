@@ -1,0 +1,25 @@
+@model PucBank.Models.Transaction
+
+@{
+    ViewData["Title"] = "Detalhes da Transação";
+}
+
+<h2>Transaction Details</h2>
+
+@if (TempData["SearchMessage"] != null)
+{
+    <div class="alert alert-warning">@TempData["SearchMessage"]</div>
+}
+else
+{
+    <div>
+        <p><strong>Id:</strong> @Model.TransactionId</p>
+        <p><strong>Título:</strong> @Model.TransactionTitle</p>
+        <p><strong>Tipo:</strong> @Model.TransactionType</p>
+        <p><strong>Quantidade:</strong> @Model.TransactionAmount</p>
+        <p><strong>Data:</strong> @Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")</p>
+        <p><strong>Saldo:</strong> R$@Model.CurrentBalance,00</p>
+    </div>
+}
+
+<a href="@Url.Action("ShowMenu", "Home")">Voltar</a>
