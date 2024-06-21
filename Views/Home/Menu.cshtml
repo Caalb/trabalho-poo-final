@@ -140,7 +140,7 @@
                         <label for="depositAmount">Nome do depósito</label>
                         <input type="text" name="depositTitle" class="form-control form-control-sm" required min="1"
                             placeholder="Pagamento de salário">
-                        <label for="depositAmount">Valor do depósito</label>
+                        <label for="depositAmount" class="mt-3">Valor do depósito</label>
                         <input type="number" name="depositAmount" class="form-control form-control-sm" required min="1"
                             placeholder="250">
                     </div>
@@ -169,7 +169,7 @@
                         <input type="text" class="form-control" id="transactionTitle" name="transactionTitle" required>
                     </div>
                 </form>
-                <div id="transactionResult"></div>
+                <div id="transactionResult" class="mt-2"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
@@ -216,7 +216,7 @@
                         <label for="depositAmount">Nome do saque</label>
                         <input type="text" name="depositTitle" class="form-control form-control-sm" required min="1"
                             placeholder="Gastos com fármacia">
-                        <label for="withdrawAmount">Valor do saque</label>
+                        <label for="withdrawAmount" class="mt-3">Valor do saque</label>
                         <input type="number" name="withdrawAmount" class="form-control form-control-sm" required min="1"
                             placeholder="250">
                     </div>
@@ -240,7 +240,7 @@
             </div>
 
             <form asp-action="DeleteTransaction" asp-controller="Home" method="post">
-                <input type="hidden" id="transactionId" name="TransactionId" />
+                <input type="hidden" id="deleteTransactionId" name="TransactionId" />
                 <div class="modal-body">
                     Tem certeza de que deseja excluir esta transação?
                 </div>

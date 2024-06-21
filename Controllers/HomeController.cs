@@ -27,7 +27,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
         {
             var user = _accountService.CreateAccount(firstName, lastName, balance);
             TempData["User"] = JsonConvert.SerializeObject(user);
-            TempData.Keep("User"); // Ensure TempData is kept
+            TempData.Keep("User");
             return RedirectToAction("ShowMenu");
         }
         catch (Exception ex)
@@ -50,7 +50,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
         var user = JsonConvert.DeserializeObject<Account>(userJson);
 
         TempData["User"] = userJson;
-        TempData.Keep("User"); // Ensure TempData is kept
+        TempData.Keep("User");
 
         return View("Menu", user);
     }
@@ -71,7 +71,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
             var user = JsonConvert.DeserializeObject<Account>(userJson);
             _accountService.Deposit(user, depositAmount, depositTitle);
             TempData["User"] = JsonConvert.SerializeObject(user);
-            TempData.Keep("User"); // Ensure TempData is kept
+            TempData.Keep("User");
 
             return RedirectToAction("ShowMenu");
         }
@@ -99,7 +99,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
             var user = JsonConvert.DeserializeObject<Account>(userJson);
             _accountService.Withdraw(user, withdrawAmount, withdrawTitle);
             TempData["User"] = JsonConvert.SerializeObject(user);
-            TempData.Keep("User"); // Ensure TempData is kept
+            TempData.Keep("User");
 
             return RedirectToAction("ShowMenu");
         }
@@ -133,7 +133,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
             _logger.LogInformation("User data updated with imported receipt");
 
             TempData["User"] = JsonConvert.SerializeObject(user);
-            TempData.Keep("User"); // Ensure TempData is kept
+            TempData.Keep("User");
 
             return RedirectToAction("ShowMenu");
         }
@@ -220,7 +220,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
                 _logger.LogWarning("Transaction with ID {TransactionId} not found.", transactionId);
                 ModelState.AddModelError("", "Transaction not found.");
                 TempData["User"] = JsonConvert.SerializeObject(user);
-                TempData.Keep("User"); // Ensure TempData is kept
+                TempData.Keep("User");
                 return RedirectToAction("ShowMenu");
             }
 
@@ -237,7 +237,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
                 _logger.LogWarning("Editing this transaction would result in a negative balance.");
                 ModelState.AddModelError("", "Editing this transaction would result in a negative balance.");
                 TempData["User"] = JsonConvert.SerializeObject(user);
-                TempData.Keep("User"); // Ensure TempData is kept
+                TempData.Keep("User");
                 return RedirectToAction("ShowMenu");
             }
 
@@ -246,7 +246,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
             transaction.TransactionAmount = amount;
 
             TempData["User"] = JsonConvert.SerializeObject(user);
-            TempData.Keep("User"); // Ensure TempData is kept
+            TempData.Keep("User");
             return RedirectToAction("ShowMenu");
         }
         catch (Exception ex)
@@ -259,7 +259,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
 
     [HttpPost]
     [Route("Home/DeleteTransaction")]
-    public IActionResult DeleteTransaction([FromForm] string transactionId)
+    public IActionResult DeleteTransaction([FromForm] string TransactionId)
     {
         try
         {
@@ -272,13 +272,13 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
 
             var user = JsonConvert.DeserializeObject<Account>(userJson);
 
-            var transaction = user.AccountHistory.Transactions.FirstOrDefault(t => t.TransactionId == transactionId);
+            var transaction = user.AccountHistory.Transactions.FirstOrDefault(t => t.TransactionId == TransactionId);
             if (transaction == null)
             {
-                _logger.LogWarning("Transaction with ID {TransactionId} not found.", transactionId);
+                _logger.LogWarning("Transaction with ID {TransactionId} not found.", TransactionId);
                 ModelState.AddModelError("", "Transaction not found.");
                 TempData["User"] = JsonConvert.SerializeObject(user);
-                TempData.Keep("User"); // Ensure TempData is kept
+                TempData.Keep("User");
                 return RedirectToAction("ShowMenu");
             }
 
@@ -290,7 +290,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
             user.AccountHistory.Transactions.Remove(transaction);
 
             TempData["User"] = JsonConvert.SerializeObject(user);
-            TempData.Keep("User"); // Ensure TempData is kept
+            TempData.Keep("User");
             return RedirectToAction("ShowMenu");
         }
         catch (Exception ex)
@@ -314,7 +314,7 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
                 return Json(new { success = false, message = "User data not found" });
             }
 
-            TempData.Keep("User"); // Retain TempData for subsequent requests
+            TempData.Keep("User");
 
             var user = JsonConvert.DeserializeObject<Account>(userJson);
             var transactions = user.AccountHistory.Transactions;
