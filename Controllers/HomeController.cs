@@ -317,8 +317,13 @@ public class HomeController(ILogger<HomeController> logger, IAccountService acco
             TempData.Keep("User");
 
             var user = JsonConvert.DeserializeObject<Account>(userJson);
-            var transactions = user.AccountHistory.Transactions;
-            var transaction = transactions.FirstOrDefault(t => t.TransactionTitle == transactionTitle);
+            var transactions = user.AccountHistory?.Transactions;
+            if (transactions == null)
+            {
+                return Json(new { success = false, message = "No transactions found." });
+            }
+
+            var transaction = transactions.FirstOrDefault(t => t.TransactionTitle?.StartsWith(transactionTitle) == true);
 
             if (transaction == null)
             {

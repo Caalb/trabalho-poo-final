@@ -43,7 +43,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
             TransactionType = TransactionType.Deposit,
             TransactionTitle = transactionTitle,
             TransactionAmount = depositAmount,
-            TransactionDate = DateTime.Now,
+            TransactionDate = DateTime.Now.ToUniversalTime().AddHours(-3),
             CurrentBalance = user.Balance
         };
 
@@ -67,7 +67,7 @@ public class AccountService(ILogger<AccountService> logger) : IAccountService
             TransactionType = TransactionType.Withdraw,
             TransactionTitle = transactionTitle,
             TransactionAmount = withdrawAmount,
-            TransactionDate = DateTime.Now,
+            TransactionDate = DateTime.Now.ToUniversalTime().AddHours(-3),
             CurrentBalance = user.Balance
         };
 
